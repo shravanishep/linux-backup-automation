@@ -1,111 +1,71 @@
 #!/bin/bash
 
-##############################################################################
-# backup.sh — Automated file backup script
-# Coursera: Hands-on Introduction to Linux Commands and Shell Scripting
-# IBM Final Project
-#
-# USAGE:
-#   ./backup.sh <targetDirectory> <destinationDirectory>
-#
-# DESCRIPTION:
-#   Finds files modified in the last 24 hours inside targetDirectory,
-#   archives them into a timestamped .tar.gz file, and saves the
-#   archive to destinationDirectory.
-##############################################################################
-
-# ─── Argument validation ────────────────────────────────────────────────────
-
-# [TASK 1] Check that exactly two arguments were provided
-if [[ $# != 2 ]]; then
-    echo "ERROR: Invalid number of arguments."
-    echo "Usage: ./backup.sh target_directory destination_directory"
-    exit 1
+# This checks if the number of arguments is correct
+# If the number of arguments is not 2 then exit.
+if [[ $# != 2 ]]
+then
+  echo "Usage: backup.sh target_directory_name destination_directory_name"
+  exit
 fi
 
-# [TASK 2] Assign the first and second command-line arguments
+# This checks if argument 1 and argument 2 are valid directory paths
+if [[ ! -d $1 ]] || [[ ! -d $2 ]]
+then
+  echo "Invalid directory path provided"
+  exit
+fi
+
+# [TASK 1]
 targetDirectory=$1
 destinationDirectory=$2
 
-# [TASK 3] Display the values of the two variables
-echo "Target directory:      $targetDirectory"
-echo "Destination directory: $destinationDirectory"
+# [TASK 2]
+echo "target directory is $targetDirectory"
+echo "backup destination is $destinationDirectory"
 
-# ─── Validate source directory ───────────────────────────────────────────────
-
-# [TASK 4] Verify the target directory exists
-if [[ ! -d "$targetDirectory" ]]; then
-    echo "ERROR: Target directory '$targetDirectory' does not exist."
-    exit 1
-fi
-
-# ─── Timestamps ─────────────────────────────────────────────────────────────
-
-# [TASK 5] Get current timestamp in seconds since epoch
+# [TASK 3]
 currentTS=$(date +%s)
 
-# [TASK 6] Calculate yesterday's timestamp (24 hours ago)
-yesterdayTS=$(( currentTS - 86400 ))
+# [TASK 4]
+backupFileName="backup-$currentTS.tar.gz"
 
-# ─── Archive filename ────────────────────────────────────────────────────────
+# We're going to:
+  # 1: Go into the target directory
+  # 2: Create the backup file
+  # 3: Move the backup file to the destination directory
 
-# [TASK 7] Define the backup archive filename using the current timestamp
-#          Format: backup-<timestamp>.tar.gz
-backupFileName="backup-${currentTS}.tar.gz"
+# To make things easier, we will define some useful variables...
 
-# ─── Prepare destination ────────────────────────────────────────────────────
+# [TASK 5]
+origAbsPath=$(pwd)
 
-# [TASK 8] Capture the absolute path of the destination directory
-#          (cd into it so we have an absolute path; create it if it doesn't exist)
-mkdir -p "$destinationDirectory"
-cd "$destinationDirectory" || { echo "ERROR: Cannot access destination '$destinationDirectory'."; exit 1; }
+# [TASK 6]
+cd "$destinationDirectory" || exit
 destAbsPath=$(pwd)
 
-# Return to the original working directory
-cd - > /dev/null || exit 1
+# [TASK 7]
+cd "$origAbsPath" || exit
+cd "$targetDirectory" || exit
 
-# ─── Collect files to back up ────────────────────────────────────────────────
+# [TASK 8]
+yesterdayTS=$(( currentTS - 86400 ))
 
-# [TASK 9] Move into the target directory to iterate its contents
-cd "$targetDirectory" || { echo "ERROR: Cannot access target '$targetDirectory'."; exit 1; }
-
-# Declare array to hold files that qualify for backup
 declare -a toBackup
 
-# [TASK 10] Loop through all items in the target directory
-for file in *; do
-    # Only process regular files (skip directories and non-files)
-    if [[ -f "$file" ]]; then
-        # [TASK 11] Compare file modification time to yesterdayTS
-        #           Include only files modified more recently than 24 hours ago
-        fileTS=$(date -r "$file" +%s 2>/dev/null)
-        if [[ -n "$fileTS" ]] && (( fileTS > yesterdayTS )); then
-            toBackup+=("$file")
-        fi
-    fi
+for file in $(ls) # [TASK 9]
+do
+  # [TASK 10]
+  if (( $(date -r "$file" +%s) > yesterdayTS ))
+  then
+    # [TASK 11]
+    toBackup+=("$file")
+  fi
 done
 
-# ─── Create the archive ──────────────────────────────────────────────────────
+# [TASK 12]
+tar -czvf "$backupFileName" "${toBackup[@]}"
 
-# [TASK 12] Create the compressed archive if there are files to back up
-if [[ ${#toBackup[@]} -gt 0 ]]; then
-    echo "Files to back up (${#toBackup[@]}):"
-    for f in "${toBackup[@]}"; do echo "  - $f"; done
+# [TASK 13]
+mv "$backupFileName" "$destAbsPath"
 
-    tar -czf "$backupFileName" "${toBackup[@]}"
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: tar failed to create archive."
-        exit 1
-    fi
-
-    # [TASK 13] Move the completed archive to the destination directory
-    mv "$backupFileName" "$destAbsPath/"
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to move archive to '$destAbsPath/'."
-        exit 1
-    fi
-
-    echo "SUCCESS: Backup archive created → $destAbsPath/$backupFileName"
-else
-    echo "INFO: No files modified in the last 24 hours. No backup created."
-fi
+# Congratulations! You've completed the final project for this course!
