@@ -1,0 +1,13 @@
+# backup-permissions — Evidence for Coursera Task 2
+# Command: chmod +x backup.sh && ls -l backup.sh
+# Run in WSL Ubuntu on: 2026-10-26
+
+$ chmod +x backup.sh
+$ ls -l backup.sh
+-rwxrwxrwx 1 shravani__shep shravani__shep 4748 Oct 26 11:54 backup.sh
+
+# The output above shows:
+#   -rwx  → owner has read, write, execute
+#   rwx   → group has read, write, execute
+#   rwx   → others have read, write, execute
+# The executable bit (x) is set for all permission classes.

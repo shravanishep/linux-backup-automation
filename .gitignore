@@ -1,0 +1,35 @@
+# Gitignore for Linux Backup Automation Project
+
+# Generated backup archives — never commit real backup data
+*.tar.gz
+*.tar
+*.zip
+*.bz2
+*.gz
+
+# Test output directories
+tests/test-backups/
+tests/test-source/
+test-backups/
+test-source/
+
+# Log files
+*.log
+/var/log/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor artifacts
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Secrets and credentials
+*.pem
+*.key
+*.env
+.env*

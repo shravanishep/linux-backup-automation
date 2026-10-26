@@ -1,0 +1,25 @@
+# backup-file-check — Evidence for Coursera Task 3
+# Command: ./backup.sh tests/test-source tests/test-backups && ls -lh tests/test-backups/
+# Run in WSL Ubuntu on: 2026-10-26
+
+$ ./backup.sh tests/test-source tests/test-backups
+Target directory:      tests/test-source
+Destination directory: tests/test-backups
+Files to back up (3):
+  - recent with space.txt
+  - recent_file_1.txt
+  - recent_file_2.log
+SUCCESS: Backup archive created → /mnt/c/Users/shrav/OneDrive/Desktop/corsera-hands-on/tests/test-backups/backup-1793015955.tar.gz
+
+$ ls -lh tests/test-backups/backup-*.tar.gz
+-rwxrwxrwx 1 shravani__shep shravani__shep 197 Oct 26 11:59 tests/test-backups/backup-1793015955.tar.gz
+
+$ tar -tf tests/test-backups/backup-1793015955.tar.gz
+recent with space.txt
+recent_file_1.txt
+recent_file_2.log
+
+# Archive backup-1793015955.tar.gz was created successfully.
+# The filename follows the format: backup-<epoch_timestamp>.tar.gz
+# Only files modified in the last 24 hours are included.
+# Old files (old_file_1.txt, old_file_2.conf) are correctly excluded.

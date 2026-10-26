@@ -1,0 +1,2 @@
+$ crontab -l
+0 2 * * * /usr/local/bin/backup.sh /home/shravani__shep/source_backup /home/shravani__shep/backups >> /var/log/backup.log 2>&1
